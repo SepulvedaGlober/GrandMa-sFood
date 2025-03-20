@@ -3,15 +3,13 @@ package project.grandmasfood.domain.usecase;
 
 import lombok.RequiredArgsConstructor;
 import project.grandmasfood.domain.api.IProductServicePort;
-import project.grandmasfood.domain.exceptions.DuplicateFantasyNameException;
-import project.grandmasfood.domain.exceptions.InvalidProductDataException;
-import project.grandmasfood.domain.exceptions.NoDataFoundException;
-import project.grandmasfood.domain.exceptions.ProductNotFoundException;
+import project.grandmasfood.domain.exceptions.*;
 import project.grandmasfood.domain.models.Product;
 import project.grandmasfood.domain.spi.IProductPersistencePort;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static project.grandmasfood.utils.Constants.MAX_PRODUCT_DESCRIPTION_LENGTH;
 import static project.grandmasfood.utils.Constants.MAX_PRODUCT_NAME_LENGTH;
@@ -32,23 +30,23 @@ public class ProductUseCase implements IProductServicePort {
             throw new DuplicateFantasyNameException(DUPLICATE_FANTASY_NAME_EXCEPTION);
         }
         if(product.getFantasyName().length() > MAX_PRODUCT_NAME_LENGTH){
-            throw new InvalidProductDataException(INVALID_PRODUCT_DATA_NAME_EXCEPTION);
+            throw new InvalidProductDataNameException(INVALID_PRODUCT_DATA_NAME_EXCEPTION);
         }
         if(product.getDescription().length() > MAX_PRODUCT_DESCRIPTION_LENGTH){
-            throw new InvalidProductDataException(INVALID_PRODUCT_DATA_DESCRIPTION_EXCEPTION);
+            throw new InvalidProductDataDescriptionException(INVALID_PRODUCT_DATA_DESCRIPTION_EXCEPTION);
         }
         if(product.getPrice() < 0 || !isValidPrice(product.getPrice())){
-            throw new InvalidProductDataException(INVALID_PRODUCT_DATA_PRICE_EXCEPTION);
+            throw new InvalidProductDataPriceException(INVALID_PRODUCT_DATA_PRICE_EXCEPTION);
         }
-
+        product.setUuid(UUID.randomUUID());
         productPersistencePort.createProduct(product);
 
     }
 
     @Override
     public void updateProduct(Product product) {
-        Long idProduct = product.getIdProduct();
-        Product existingProduct = productPersistencePort.getProductById(idProduct)
+        UUID uuid = product.getUuid();
+        Product existingProduct = productPersistencePort.getProductByUuid(uuid)
                 .orElseThrow(() -> new ProductNotFoundException(
                         NO_ID_PRODUCT_FOUND_EXCEPTION));
 
@@ -58,18 +56,17 @@ public class ProductUseCase implements IProductServicePort {
                 throw new DuplicateFantasyNameException(DUPLICATE_FANTASY_NAME_EXCEPTION);
             }
         }
-        product.setIdProduct(existingProduct.getIdProduct());
+        product.setUuid(existingProduct.getUuid());
         productPersistencePort.updateProduct(product);
 
     }
 
     @Override
-    public void deleteProduct(Long idProduct) {
-        Product product = productPersistencePort.getProductById(idProduct)
+    public void deleteProduct(UUID uuid) {
+        Product product = productPersistencePort.getProductByUuid(uuid)
                 .orElseThrow(() -> new ProductNotFoundException(
                         NO_ID_PRODUCT_FOUND_EXCEPTION
                 ));
-
         productPersistencePort.deleteProduct(product);
 
     }
@@ -85,6 +82,14 @@ public class ProductUseCase implements IProductServicePort {
             throw new ProductNotFoundException(NO_ID_PRODUCT_FOUND_EXCEPTION);
         }
         return productPersistencePort.getProductById(idProduct);
+    }
+
+    @Override
+    public Optional<Product> getProductByUuid(UUID uuid) {
+        if(productPersistencePort.getProductByUuid(uuid).isEmpty()){
+            throw new ProductNotFoundException(NO_ID_PRODUCT_FOUND_EXCEPTION);
+        }
+        return productPersistencePort.getProductByUuid(uuid);
     }
 
     @Override

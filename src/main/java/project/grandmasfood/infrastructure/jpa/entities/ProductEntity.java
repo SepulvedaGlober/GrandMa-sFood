@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import project.grandmasfood.domain.models.Category;
 
-
+import java.util.UUID;
 
 
 @Entity
@@ -15,15 +15,16 @@ public class ProductEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_product")
     private Long idProduct;
+
+    @Column(name = "uuid", nullable = false)
+    private UUID uuid;
+
     @Column(name = "fantasy_name", nullable = false)
     private String fantasyName;
     @Enumerated(EnumType.STRING)
     @Column(name = "category", nullable = false)
     private Category category;
-    @Column(name = "description", nullable = false)
     private String description;
-    @Column(name = "price", nullable = false)
     private float price;
-    @Column(name = "available", nullable = false)
     private boolean available;
 }

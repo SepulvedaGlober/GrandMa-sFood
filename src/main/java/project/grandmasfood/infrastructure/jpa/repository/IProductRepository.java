@@ -8,12 +8,13 @@ import project.grandmasfood.infrastructure.jpa.entities.ProductEntity;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
 public interface IProductRepository extends JpaRepository<ProductEntity, Long> {
     Optional<ProductEntity> findByFantasyName(String fantasyName);
     Optional<ProductEntity> findByIdProduct(Long idProduct);
-
+    Optional<ProductEntity> findByUuid(UUID uuid);
     @Query("SELECT p FROM ProductEntity p WHERE LOWER(p.fantasyName) LIKE LOWER(CONCAT('%', :keyword, '%'))ORDER BY p.fantasyName ASC ")
     List<ProductEntity> findByFantasyNameContainingIgnoreCase(@Param("keyword") String keyword);
 }

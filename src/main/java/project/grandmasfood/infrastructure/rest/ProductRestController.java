@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import project.grandmasfood.application.dto.product.ProductRequestDto;
 import project.grandmasfood.application.dto.product.ProductResponseDto;
@@ -16,6 +17,7 @@ import project.grandmasfood.application.handler.interfaces.IProductHandler;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/products")
@@ -34,7 +36,7 @@ public class ProductRestController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @PostMapping
-    public ResponseEntity<ProductResponseDto> createProduct(@RequestBody ProductRequestDto productRequestDto) {
+    public ResponseEntity<ProductResponseDto> createProduct(@Validated @RequestBody ProductRequestDto productRequestDto) {
         try{
             ProductResponseDto productResponse = productHandler.createProduct(productRequestDto);
             return ResponseEntity.status(HttpStatus.CREATED).body(productResponse);
@@ -52,9 +54,9 @@ public class ProductRestController {
             @ApiResponse(responseCode = "400", description = "Invalid UUID format"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    @GetMapping("/{idProduct}")
-    public ResponseEntity<ProductResponseDto> getProductByUuid(@PathVariable("idProduct") Long idProduct) {
-        Optional<ProductResponseDto> productResponse = productHandler.getProductById(idProduct);
+    @GetMapping("/{uuid}")
+    public ResponseEntity<ProductResponseDto> getProductByUuid(@PathVariable("uuid") UUID uuid) {
+        Optional<ProductResponseDto> productResponse = productHandler.getProductByUuid(uuid);
         return productResponse.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));
     }
 
@@ -67,10 +69,10 @@ public class ProductRestController {
             @ApiResponse(responseCode = "404", description = "Product not found"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    @PutMapping("/{idProduct}")
-    public ResponseEntity<ProductResponseDto> updateProduct(@PathVariable Long idProduct, @RequestBody ProductRequestDto productRequestDto) {
+    @PutMapping("/{uuid}")
+    public ResponseEntity<ProductResponseDto> updateProduct(@PathVariable UUID uuid, @Validated @RequestBody ProductRequestDto productRequestDto) {
         try{
-            productHandler.updateProduct(idProduct, productRequestDto);
+            productHandler.updateProduct(uuid, productRequestDto);
             return ResponseEntity.noContent().build();
         }catch (IllegalArgumentException e){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
@@ -85,9 +87,9 @@ public class ProductRestController {
             @ApiResponse(responseCode = "400", description = "Invalid ID format"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
-        productHandler.deleteProduct(id);
+    @DeleteMapping("/{uuid}")
+    public ResponseEntity<Void> deleteProduct(@PathVariable UUID uuid) {
+        productHandler.deleteProduct(uuid);
         return ResponseEntity.noContent().build();
     }
 

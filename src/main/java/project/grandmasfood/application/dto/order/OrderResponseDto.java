@@ -1,13 +1,14 @@
-package project.grandmasfood.domain.models;
+package project.grandmasfood.application.dto.order;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-@Data
-public class Order {
-    private Long idOrder;
+@Getter
+@Setter
+public class OrderResponseDto {
     private UUID uuid;
     private LocalDateTime creationDateTime;
     private String clientDocument;

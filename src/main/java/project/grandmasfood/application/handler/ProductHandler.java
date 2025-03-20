@@ -13,7 +13,7 @@ import project.grandmasfood.domain.models.Product;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.UUID;
 
 
 @Service
@@ -34,15 +34,15 @@ public class ProductHandler implements IProductHandler {
     }
 
     @Override
-    public void updateProduct(Long idProduct, ProductRequestDto productRequestDto) {
+    public void updateProduct(UUID uuid, ProductRequestDto productRequestDto) {
         Product product = productRequestMapper.toProduct(productRequestDto);
-        product.setIdProduct(idProduct);
+        product.setUuid(uuid);
         productServicePort.updateProduct(product);
     }
 
     @Override
-    public void deleteProduct(Long idProduct) {
-        productServicePort.deleteProduct(idProduct);
+    public void deleteProduct(UUID uuid) {
+        productServicePort.deleteProduct(uuid);
     }
 
     @Override
@@ -55,7 +55,13 @@ public class ProductHandler implements IProductHandler {
     public List<ProductResponseDto> getAllProducts() {
         return productServicePort.getAllProducts().stream()
                 .map(productResponseMapper::toProductResponse)
-                .collect(Collectors.toList());
+                .toList();
+    }
+
+    @Override
+    public Optional<ProductResponseDto> getProductByUuid(UUID uuid) {
+        return productServicePort.getProductByUuid(uuid)
+                .map(productResponseMapper::toProductResponse);
     }
 
     @Override
@@ -63,6 +69,6 @@ public class ProductHandler implements IProductHandler {
         List<Product> products = productServicePort.searchProductsByFantasyName(keyword);
         return products.stream()
                 .map(productResponseMapper::toProductResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
 }

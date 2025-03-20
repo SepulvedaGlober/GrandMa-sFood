@@ -56,7 +56,7 @@ public class ClientUseCase implements IClientServicePort {
     @Override
     public List<Client> getAllClients() {
         List<Client> clients = clientPersistencePort.getAllClients();
-        if(clients.isEmpty()){
+        if (clients.isEmpty()){
             throw new ClientNotFoundException(NO_CLIENT_FOUND_EXCEPTION);
         }
         return clients;

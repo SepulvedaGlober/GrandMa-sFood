@@ -12,6 +12,7 @@ import project.grandmasfood.infrastructure.jpa.repository.IProductRepository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static project.grandmasfood.utils.ErrorMessages.*;
 
@@ -34,7 +35,7 @@ public class ProductJpaAdapter implements IProductPersistencePort {
 
     @Override
     public void updateProduct(Product product) {
-        ProductEntity existingProduct = productRepository.findById(product.getIdProduct())
+        ProductEntity existingProduct = productRepository.findByUuid(product.getUuid())
                 .orElseThrow(() -> new ProductNotFoundException(NO_ID_PRODUCT_FOUND_EXCEPTION));
 
         existingProduct.setFantasyName(product.getFantasyName());
@@ -49,7 +50,7 @@ public class ProductJpaAdapter implements IProductPersistencePort {
 
     @Override
     public void deleteProduct(Product product) {
-        ProductEntity existingProduct = productRepository.findById(product.getIdProduct())
+        ProductEntity existingProduct = productRepository.findByUuid(product.getUuid())
                 .orElseThrow(() -> new ProductNotFoundException(NO_ID_PRODUCT_FOUND_EXCEPTION));
         productRepository.delete(existingProduct);
 
@@ -74,6 +75,16 @@ public class ProductJpaAdapter implements IProductPersistencePort {
     public Optional<Product> getProductByFantasyName(String fantasyName) {
         return productRepository.findByFantasyName(fantasyName)
                 .map(productEntityMapper::toProduct);
+    }
+
+    @Override
+    public Optional<Product> getProductByUuid(UUID uuid) {
+        Optional<Product> product = productRepository.findByUuid(uuid)
+                .map(productEntityMapper::toProduct);
+        if (product.isEmpty()) {
+            throw new ProductNotFoundException(NO_ID_PRODUCT_FOUND_EXCEPTION);
+        }
+        return product;
     }
 
     @Override

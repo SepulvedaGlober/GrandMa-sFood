@@ -5,16 +5,22 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import project.grandmasfood.domain.api.IClientServicePort;
+import project.grandmasfood.domain.api.IOrderServicePort;
 import project.grandmasfood.domain.api.IProductServicePort;
 import project.grandmasfood.domain.spi.IClientPersistencePort;
+import project.grandmasfood.domain.spi.IOrderPersistencePort;
 import project.grandmasfood.domain.spi.IProductPersistencePort;
 import project.grandmasfood.domain.usecase.ClientUseCase;
+import project.grandmasfood.domain.usecase.OrderUseCase;
 import project.grandmasfood.domain.usecase.ProductUseCase;
 import project.grandmasfood.infrastructure.jpa.adapter.ClientJpaAdapter;
+import project.grandmasfood.infrastructure.jpa.adapter.OrderJpaAdapter;
 import project.grandmasfood.infrastructure.jpa.adapter.ProductJpaAdapter;
 import project.grandmasfood.infrastructure.jpa.mapper.client.IClientEntityMapper;
+import project.grandmasfood.infrastructure.jpa.mapper.order.IOrderEntityMapper;
 import project.grandmasfood.infrastructure.jpa.mapper.product.IProductEntityMapper;
 import project.grandmasfood.infrastructure.jpa.repository.IClientRepository;
+import project.grandmasfood.infrastructure.jpa.repository.IOrderRepository;
 import project.grandmasfood.infrastructure.jpa.repository.IProductRepository;
 
 @RequiredArgsConstructor
@@ -28,6 +34,10 @@ public class BeanConfiguration {
     //Client
     private final IClientRepository clientRepository;
     private final IClientEntityMapper clientEntityMapper;
+
+    //Order
+    private final IOrderRepository orderRepository;
+    private final IOrderEntityMapper orderEntityMapper;
 
     @Bean
     public IProductServicePort productServicePort() {
@@ -49,5 +59,15 @@ public class BeanConfiguration {
         return new ClientJpaAdapter(clientRepository, clientEntityMapper);
     }
 
+
+    @Bean
+    public IOrderServicePort orderServicePort() {
+        return new OrderUseCase(orderPersistencePort(), productPersistencePort(), clientPersistencePort());
+    }
+
+    @Bean
+    public IOrderPersistencePort orderPersistencePort() {
+        return new OrderJpaAdapter(orderRepository, clientRepository, productRepository, orderEntityMapper);
+    }
 
 }

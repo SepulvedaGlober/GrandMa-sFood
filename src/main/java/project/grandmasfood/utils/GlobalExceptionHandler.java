@@ -9,10 +9,11 @@ import project.grandmasfood.infrastructure.exceptions.DuplicateDocumentException
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
+
     @ExceptionHandler(ProductNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleProductNotFoundException(ProductNotFoundException ex) {
         ErrorResponse errorResponse = new ErrorResponse(
-                ErrorCode.NO_PRODUCT_ID_FOUND.getCode(),
+                ErrorCode.NO_PRODUCT_UUID_FOUND.getCode(),
                 ErrorMessages.NO_ID_PRODUCT_FOUND_EXCEPTION,
                 ex.getClass().getSimpleName());
         return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
@@ -100,6 +101,15 @@ public class GlobalExceptionHandler {
                 ErrorMessages.DUPLICATE_DOCUMENT,
                 ex.getClass().getSimpleName());
         return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(OrderNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleOrderNotFoundException(OrderNotFoundException ex) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                ErrorCode.ORDER_NOT_FOUND.getCode(),
+                ErrorMessages.ORDER_NOT_FOUND,
+                ex.getClass().getSimpleName());
+        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
 
 }

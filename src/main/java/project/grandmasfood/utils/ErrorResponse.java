@@ -20,9 +20,4 @@ public class ErrorResponse {
         this.exception = exception;
     }
 
-    public ErrorResponse(String code, String description) {
-        this.code = code;
-        this.timestamp = LocalDateTime.now();
-        this.description = description;
-    }
 }

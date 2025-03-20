@@ -16,4 +16,7 @@ public class Constants {
     public static final String PHONE_VALIDATION_REGEX = "^[0-9]{10,10}$";
     public static final String DOCUMENT_VALIDATION_REGEX = "^(CC|CE|P)-[a-zA-Z0-9]{1,17}$";
 
+    private Constants(){
+        throw new IllegalStateException("Utility class");
+    }
 }
